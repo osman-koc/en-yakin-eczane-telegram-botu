@@ -39,3 +39,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+            COLLECT_API_TOKEN=${{ secrets.COLLECT_API_TOKEN }}
+            COLLECT_API_URI=${{ secrets.COLLECT_API_URI }}
+            OPENSTREETMAP_URI=${{ secrets.OPENSTREETMAP_URI }}

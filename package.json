@@ -1,0 +1,30 @@
+{
+  "name": "enyakineczanebot",
+  "version": "1.0.0",
+  "description": "Yakındaki veya nöbetçi eczaneleri sorgulamak için Telegram botu",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osman-koc/en-yakin-eczane-telegram-botu.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "nöbetçi",
+    "eczane"
+  ],
+  "author": "Osman Koç",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/osman-koc/en-yakin-eczaneyi-bul-telegram-botu/issues"
+  },
+  "homepage": "https://github.com/osman-koc/en-yakin-eczaneyi-bul-telegram-botu#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "geolib": "^3.3.4",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}

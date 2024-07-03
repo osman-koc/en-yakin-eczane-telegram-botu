@@ -117,8 +117,3 @@ bot.on('callback_query', async (callbackQuery) => {
         bot.context = {};
     }
 });
-
-// Başlatma mesajı
-bot.on('polling_started', () => {
-    console.log('Bot başarıyla başlatıldı ve dinlemeye başladı.');
-});

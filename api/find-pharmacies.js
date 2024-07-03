@@ -7,15 +7,11 @@ async function findPharmaciesFromDb(city, district, userLocation) {
     const upperCaseCity = city.toLocaleUpperCase('tr');
     const upperCaseDistrict = district.toLocaleUpperCase('tr');
 
-    console.log('Kullanıcının bulunduğu il/ilçe:', upperCaseCity, upperCaseDistrict);
-
     // Eczaneleri il ve ilçe bilgisine göre filtrele
     const filteredPharmacies = pharmacies.filter(pharmacy =>
         pharmacy.city.toLocaleUpperCase('tr') === upperCaseCity &&
         pharmacy.district.toLocaleUpperCase('tr') === upperCaseDistrict
     );
-
-    console.log('Bulunan eczane sayısı:', filteredPharmacies.length);
 
     // Her eczane için merkezden uzaklık hesapla ve sırala
     const pharmaciesWithDistances = filteredPharmacies.map(pharmacy => {

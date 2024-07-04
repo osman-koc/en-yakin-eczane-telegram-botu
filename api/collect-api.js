@@ -28,7 +28,7 @@ async function fetchNearestPharmacies(city, district, userLocation) {
                 longitude: parseFloat(longitude)
             };
             const distance = geolib.getDistance(userLocation, pharmacyLocation); // metre cinsinden uzaklık
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${pharmacy.loc}`;
+            const googleMapsUrl = `${process.env.GOOGLE_MAPS_URI}&query=${pharmacy.loc}`;
             
             return { ...pharmacy, distance, googleMapsUrl };
         });

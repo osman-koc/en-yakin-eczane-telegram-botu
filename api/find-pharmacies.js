@@ -29,9 +29,8 @@ async function findPharmaciesFromDb(city, district, userLocation) {
             longitude: parseFloat(pharmacy.lon)
         };
 
-        const googleBaseUrl = 'https://www.google.com/maps/search/?api=1';
         const addressQuery = queryString.stringify({ query: pharmacy.address });
-        const googleMapsUrl = `${googleBaseUrl}&${addressQuery}`;
+        const googleMapsUrl = `${process.env.GOOGLE_MAPS_URI}&${addressQuery}`;
 
         const distance = geolib.getDistance(userLocation, pharmacyLocation); // metre cinsinden uzaklık
         return { ...pharmacy, distance, googleMapsUrl };

@@ -49,6 +49,8 @@ https://t.me/EnYakinEczaneBot
    COLLECT_API_TOKEN=<your_collect_apikey>
    COLLECT_API_URI=https://api.collectapi.com/health/dutyPharmacy
    OPENSTREETMAP_URI=https://nominatim.openstreetmap.org/reverse
+   GOOGLE_MAPS_URI=https://www.google.com/maps/search/?api=1
+   MY_API_URI=<customapiuri_youcanuse_collectapi_insteadofcustom>
    ```
 
 3. Proje dizinine gidin ve bağımlılıkları yükleyin:

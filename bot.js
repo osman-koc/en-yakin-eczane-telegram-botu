@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import TelegramBot from 'node-telegram-bot-api';
 import { getCityAndDistrictFromLocation } from './api/openstreetmap-api.js';
-import { fetchNearestPharmacies } from './api/collect-api.js';
+// import { fetchNearestPharmacies } from './api/collect-api.js';
+import { fetchPharmacies } from './api/my-api.js';
 import { findPharmaciesFromDb } from './api/find-pharmacies.js';
 import { isPublicHoliday } from './api/holiday-api.js';
+import queryString from 'query-string';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
@@ -43,7 +45,10 @@ bot.on('message', async (msg) => {
                 if (isWorkHour && !isWeekend && !isHoliday) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                 } else {
-                    nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
+                    // Collect API
+                    // nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
+                    // MY API
+                    nearestPharmacies = await fetchPharmacies(city, district);
                 }
 
                 if (nearestPharmacies.length > 0) {
@@ -57,9 +62,13 @@ bot.on('message', async (msg) => {
                     for (let i = 0; i < initialPharmacies.length; i++) {
                         const pharmacy = initialPharmacies[i];
                         var pharmacyItemMsg = `Eczane adı: ${pharmacy.name}\nAdres: ${pharmacy.address}\nTelefon: ${pharmacy.phone}\n`;
-                        if (pharmacy.googleMapsUrl) {
-                            pharmacyItemMsg += `<a href="${pharmacy.googleMapsUrl}">Haritada göster</a>`;
+                        
+                        if (pharmacy.googleMapsUrl === undefined || pharmacy.googleMapsUrl === null || pharmacy.googleMapsUrl.length < 10) {
+                            const addressQuery = queryString.stringify({ query: pharmacy.address });
+                            pharmacy.googleMapsUrl = `${process.env.GOOGLE_MAPS_URI}&${addressQuery}`;
                         }
+
+                        pharmacyItemMsg += `<a href="${pharmacy.googleMapsUrl}">Haritada göster</a>`;
                         await bot.sendMessage(chatId, pharmacyItemMsg, { parse_mode: 'HTML' });
                         if (i < initialPharmacies.length - 1) {
                             await new Promise(resolve => setTimeout(resolve, 500));

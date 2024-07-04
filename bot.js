@@ -94,6 +94,8 @@ bot.on('message', async (msg) => {
         responseMsg = 'pong';
     } else if (toLowerMessage === 'test') {
         responseMsg = 'Sensin test :)';
+    } else {
+        responseMsg = 'Mesajınız anlaşılamadı. Tekrar deneyiniz.'
     }
 
     if (responseMsg != '') {

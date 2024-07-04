@@ -1,15 +1,7 @@
 import 'dotenv/config';
 import geolib from 'geolib';
 import queryString from 'query-string';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const pharmaciesFile = resolve(__dirname, '../db/pharmacies.json');
-const pharmaciesData = JSON.parse(readFileSync(pharmaciesFile, 'utf8'));
+import pharmaciesData from '../db/pharmacies.json' assert { type: 'json' };
 
 // Kullanıcı konumunu alıp il ve ilçeye göre eczaneleri bulan fonksiyon
 async function findPharmaciesFromDb(city, district, userLocation) {

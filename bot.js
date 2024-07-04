@@ -3,6 +3,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { getCityAndDistrictFromLocation } from './api/openstreetmap-api.js';
 import { fetchNearestPharmacies } from './api/collect-api.js';
 import { findPharmaciesFromDb } from './api/find-pharmacies.js';
+import { isPublicHoliday } from './api/holiday-api.js';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
@@ -18,6 +19,8 @@ bot.on('message', async (msg) => {
         const messageDate = new Date(msg.date * 1000);
         const hours = messageDate.getHours();
         const isWorkHour = hours >= 9 && hours < 18;
+        const isWeekend = messageDate.getDay() === 0 || messageDate.getDay() === 6;
+        const isHoliday = isPublicHoliday(messageDate);
 
         await bot.sendMessage(chatId, 'Konum bilginize göre en yakın eczaneler sorgulanıyor.');
         var locationSuccess = false;
@@ -37,7 +40,7 @@ bot.on('message', async (msg) => {
 
                 
                 let nearestPharmacies;
-                if (isWorkHour) {
+                if (isWorkHour && !isWeekend && !isHoliday) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                 } else {
                     nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
@@ -113,7 +116,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
         }
-        
+
         bot.context = {};
     }
 });

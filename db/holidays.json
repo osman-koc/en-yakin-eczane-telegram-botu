@@ -1,0 +1,41 @@
+{
+    "holidays": [
+        {
+            "name": "Yılbaşı",
+            "date": "2024-01-01"
+        },
+        {
+            "name": "Ramazan Bayramı",
+            "date": "2024-04-09"
+        },
+        {
+            "name": "Ulusal Egemenlik ve Çocuk Bayramı",
+            "date": "2024-04-23"
+        },
+        {
+            "name": "Emek ve Dayanışma Günü",
+            "date": "2024-05-01"
+        },
+        {
+            "name": "Atatürk'ü Anma, Gençlik ve Spor Bayramı",
+            "date": "2024-05-19"
+        },
+        {
+            "name": "Kurban Bayramı",
+            "startDate": "2024-06-15",
+            "endDate": "2024-06-19"
+        },
+        {
+            "name": "Demokrasi ve Milli Birlik Günü",
+            "date": "2024-07-15"
+        },
+        {
+            "name": "Zafer Bayramı",
+            "date": "2024-08-30"
+        },
+        {
+            "name": "Cumhuriyet Bayramı",
+            "date": "2024-10-29"
+        }
+    ]
+}

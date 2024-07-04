@@ -6,10 +6,10 @@ Bu proje, kullanıcının konumuna göre en yakın eczaneleri bulan ve Telegram 
 
 ## Kullanım
 
-Telegram hesabınız varsa kullanıcı arama kısmına "En Yakın Eczaneyi Bul" yazarak veya aşağıdaki linkten bota ulaşabilirsiniz:
-https://t.me/EnYakinEczaneBot 
+Telegram hesabınız varsa kullanıcı arama kısmına `En Yakın Eczaneyi Bul` yazarak veya aşağıdaki linkten bota ulaşabilirsiniz:
+https://t.me/EnYakinEczaneBot
 
-<img src="./img/bot-logo.png" width="150" /> 
+<a href="https://t.me/EnYakinEczaneBot"><img src="./img/bot-logo.png" width="150" /></a>
 
 ## Başlangıç
 

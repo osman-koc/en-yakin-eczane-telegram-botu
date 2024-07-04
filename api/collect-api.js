@@ -1,5 +1,5 @@
-require('dotenv').config();
-const geolib = require('geolib');
+import 'dotenv/config';
+import geolib from 'geolib';
 
 async function fetchNearestPharmacies(city, district, userLocation) {
     const url =  `${process.env.COLLECT_API_URI}?ilce=${encodeURIComponent(district)}&il=${encodeURIComponent(city)}`;
@@ -44,6 +44,4 @@ async function fetchNearestPharmacies(city, district, userLocation) {
     }
 }
 
-module.exports = {
-    fetchNearestPharmacies
-};
+export { fetchNearestPharmacies };

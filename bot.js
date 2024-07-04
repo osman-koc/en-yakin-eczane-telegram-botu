@@ -1,8 +1,8 @@
-require('dotenv').config();
-const TelegramBot = require('node-telegram-bot-api');
-const { getCityAndDistrictFromLocation } = require('./api/openstreetmap-api.js');
-const { fetchNearestPharmacies } = require('./api/collect-api.js');
-const { findPharmaciesFromDb } = require('./api/find-pharmacies.js');
+import 'dotenv/config';
+import TelegramBot from 'node-telegram-bot-api';
+import { getCityAndDistrictFromLocation } from './api/openstreetmap-api.js';
+import { fetchNearestPharmacies } from './api/collect-api.js';
+import { findPharmaciesFromDb } from './api/find-pharmacies.js';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
@@ -113,7 +113,7 @@ bot.on('callback_query', async (callbackQuery) => {
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
         }
-        // Clear remaining pharmacies after sending
+        
         bot.context = {};
     }
 });

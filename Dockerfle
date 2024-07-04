@@ -1,12 +1,8 @@
 FROM node:18.17.1
 
-ARG TELEGRAM_BOT_TOKEN
-ARG COLLECT_API_TOKEN
-
-ENV TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
-ENV COLLECT_API_TOKEN=$COLLECT_API_TOKEN
 ENV COLLECT_API_URI="https://api.collectapi.com/health/dutyPharmacy"
 ENV OPENSTREETMAP_URI="https://nominatim.openstreetmap.org/reverse"
+ENV GOOGLE_MAPS_URI="https://www.google.com/maps/search/?api=1"
 
 WORKDIR /usr/src/app
 

@@ -15,8 +15,8 @@ bot.on('message', async (msg) => {
     var responseMsg = '';
 
     if (msg && msg.location) {
-        const now = new Date();
-        const hours = now.getHours();
+        const messageDate = new Date(msg.date * 1000);
+        const hours = messageDate.getHours();
         const isWorkHour = hours >= 9 && hours < 18;
 
         await bot.sendMessage(chatId, 'Konum bilginize göre en yakın eczaneler sorgulanıyor.');

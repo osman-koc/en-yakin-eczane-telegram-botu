@@ -11,15 +11,21 @@ async function getCityAndDistrictFromLocation(latitude, longitude) {
     }
 
     let city = locationData.address.province || locationData.address.district || locationData.address.city || locationData.address.village || '';
-    const district = locationData.address.town || locationData.address.county || locationData.address.residential || '';
-
-    if (city === '' && district === '') {
-        console.log('-> Request for LocationUrl: ' + locationUrl);
-        throw new Error('Konum bilgisi alınamadı.');
-    }
+    let district = locationData.address.town || locationData.address.county || locationData.address.residential || '';
 
     if (city.includes(' ')) {
         city = city.split(' ')[0];
+        if (city.split(' ').length > 1 && district === '') {
+            district = city.split(' ')[1];
+        }
+    }
+
+    if (district === '' && locationData.address.city){
+        district = locationData.address.city.split(' ')[1];
+    }
+
+    if (city === '' || district === '') {
+        console.log('-> Request for LocationUrl: ' + locationUrl);
     }
 
     return { city, district };

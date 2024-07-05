@@ -33,6 +33,7 @@ bot.on('message', async (msg) => {
 
         try {
             const { city, district } = await getCityAndDistrictFromLocation(latitude, longitude);
+            console.log(`-> Request for: ${city} / ${district}`);
             if (city && district) {
                 locationSuccess = true;
 

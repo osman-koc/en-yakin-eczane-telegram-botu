@@ -40,7 +40,6 @@ bot.on('message', async (msg) => {
                     longitude: msg.location.longitude
                 };
 
-                
                 let nearestPharmacies;
                 if (isWorkHour && !isWeekend && !isHoliday) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);

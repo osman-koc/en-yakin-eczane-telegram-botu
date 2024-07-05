@@ -19,7 +19,8 @@ bot.on('message', async (msg) => {
 
     if (msg && msg.location) {
         const messageDate = new Date(msg.date * 1000);
-        const hours = messageDate.getHours();
+        const hours = messageDate.toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', hour12: false, hour: 'numeric' });
+
         const isWorkHour = hours >= 9 && hours < 18;
         const isWeekend = messageDate.getDay() === 0 || messageDate.getDay() === 6;
         const isHoliday = isPublicHoliday(messageDate);

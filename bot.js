@@ -44,6 +44,8 @@ bot.on('message', async (msg) => {
                 if (isWorkHour && !isWeekend && !isHoliday) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                 } else {
+                    console.log(`-> Get API - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
+
                     // Collect API
                     // nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
                     // MY API

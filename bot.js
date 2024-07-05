@@ -104,6 +104,8 @@ bot.on('message', async (msg) => {
         responseMsg = 'Bu bot konumunuza göre size en yakın eczane bilgilerini bulup göndermeye yarar. Bunun için mevcut konumunuzu bota göndermeniz yeterli. Konum bilginiz hiçbir yerde kayıt edilmemektedir.'
     } else if (toLowerMessage.includes('gelistirici') || toLowerMessage.includes('geliştirici') || toLowerMessage.includes('geliştiren') || toLowerMessage.includes('yazılımcı')) {
         responseMsg = 'Bu bot, Osman Koç tarafından geliştirildi. İletişim için info@osmkoc.com adresine mail atabilirsiniz.'
+    } else if (toLowerMessage === '/contact') {
+        responseMsg = 'Bir hata veya öneri bildirmek isterseniz info@osmkoc.com adresine mail gönderebilirsiniz. Şimdiden teşekkürler!'
     } else if (toLowerMessage === 'ping') {
         responseMsg = 'pong';
     } else if (toLowerMessage === 'test') {

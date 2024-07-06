@@ -2,10 +2,9 @@ import 'dotenv/config';
 import TelegramBot from 'node-telegram-bot-api';
 import { getCityAndDistrictFromLocation } from './api/openstreetmap-api.js';
 import { fetchNearestPharmacies } from './api/collect-api.js';
-import { fetchPharmacies } from './api/my-api.js';
+import { fetchPharmacies, appendUsageDataToGoogleSheets } from './api/my-api.js';
 import { findPharmaciesFromDb } from './api/find-pharmacies.js';
 import { isPublicHoliday } from './api/holiday-api.js';
-import { appendData } from './api/google-sheets-api.js';
 import queryString from 'query-string';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -99,18 +98,18 @@ bot.on('message', async (msg) => {
                     responseMsg = 'Yakınınızda eczane bulunamadı.';
                 }
 
-                if (process.env.GOOGLE_SHEETS_CREDENTIALS) {
-                    const rowData = [
-                        new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' }),
+                if (process.env.MY_API_URI) {
+                    const rowData = {
+                        date: new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' }),
                         chatId,
                         city,
                         district
-                    ];
-                    await appendData(rowData);
+                    };
+                    await appendUsageDataToGoogleSheets(rowData);
                 }
             }
         } catch (error) {
-            console.error('Konum bilgisi alınırken hata oluştu:', error);
+            console.error('Hata oluştu:', error);
             responseMsg = 'Servislerde oluşan bir hatadan dolayı şu anda isteğinize yanıt alamadım. Konumu doğru gönderdiğinizden eminseniz tekrar deneyebilirsiniz.';
         }
 

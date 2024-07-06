@@ -13,26 +13,15 @@ https://t.me/EnYakinEczaneBot
 
 ## Başlangıç
 
+Uygulamayı npm ile manuel olarak veya docker üzerinden pull edip run ederek çalıştırmanız mümkün.
+
 ### Gereksinimler
 
-- Docker
-- Docker Compose (opsiyonel)
+- NPM (manuel kurulum için) veya Docker
+- Telegram bot token bilgisi
+- Collect API token bilgisi
 
 ### Kurulum
-
-#### Docker Kullanarak
-
-1. Proje dizinine gidin ve Docker imajını oluşturun:
-
-   ```bash
-   docker build -t en-yakin-eczane-botu .
-   ```
-
-2. Docker imajını çalıştırın:
-
-   ```bash
-   docker run -d --name eczane-botu en-yakin-eczane-botu
-   ```
 
 #### Manuel Kurulum
 
@@ -42,10 +31,11 @@ https://t.me/EnYakinEczaneBot
    npm install
    ```
 
-2. `.env` dosyasını oluşturun ve aşağıdaki bilgileri ekleyin:
+2. `.env.example` dosyasını `.env` olarak yeniden adlandırın ve aşağıdaki bilgileri düzenleyin:
 
    ```bash
    TELEGRAM_BOT_TOKEN=<your_telegram_bot_token>
+   USE_COLLECT_API=true
    COLLECT_API_TOKEN=<your_collect_apikey>
    COLLECT_API_URI=https://api.collectapi.com/health/dutyPharmacy
    OPENSTREETMAP_URI=https://nominatim.openstreetmap.org/reverse
@@ -53,16 +43,55 @@ https://t.me/EnYakinEczaneBot
    MY_API_URI=<customapiuri_youcanuse_collectapi_insteadofcustom>
    ```
 
+   Buradaki `MY_API_URI` benim yazdığım başka bir servisin adresi. Bu servis, nöbetçi eczaneleri sunuyor. Henüz stabil olmadığından dolayı dış kullanıma açık değil, bu nedenle de burada bilgilerini paylaşamıyorum. Eğer kendi servisiniz varsa buraya onun adresini koyabilirsiniz. Tabii response için `./api/my-api.js` dosyasını düzenlemeyi unutmayın.
+
+   Alternatif olarak, Collect API kullanabilirsiniz. Bunun için de <a href="https://collectapi.com/">collectapi.com</a> adresinde üye olup alacağınız token bilgisini COLLECT_API_TOKEN içerisine yapıştırın. Ardından <a href="https://collectapi.com/tr/api/health/nobetci-eczane-api">buradaki</a> adrese giderek "Ücretlendirme" sekmesinden istediğiniz bir pakete "Subscribe" yani abone olmanız gerekiyor. Bu işlemleri tamamladıktan sonra Collect API'daki nöbetçi eczane servisini kullanabilirsiniz. Bu zaten var olan bir servis, benim yaptığım bir şey değil.
+
+   Eğer collect api kullanacaksanız `USE_COLLECT_API` değerini `true` olarak bırakın. Kendi servisinizi kullanacaksanız, bu değeri `false` olarak değiştirin.
+
 3. Proje dizinine gidin ve bağımlılıkları yükleyin:
 
    ```bash
    npm run start
    ```
 
+#### Docker Kullanarak
+
+Repo'yu indirerek Dockerfile üzerinden yapmak için manuel kurulumdaki env adımını aynı şekilde uygulamalısınız.
+
+1. Proje dizinine gidin ve Docker imajını oluşturun:
+
+   ```bash
+   docker build -t en-yakin-eczane-telegram-botu .
+   ```
+
+2. Docker imajını çalıştırın:
+
+   ```bash
+   docker run -d --name eczane-botu en-yakin-eczane-telegram-botu
+   ```
+
+Repo'yu indirmeden Docker Hub üzerinden image'ı indirip çalıştırmak için:
+
+   ```bash
+   docker run -d \
+   -e TELEGRAM_BOT_TOKEN="<token_degerini_buraya_girin>" \
+   -e COLLECT_API_TOKEN="<token_degerini_buraya_girin>" \
+   byengineer/en-yakin-eczane-telegram-botu:master
+   ```
+
 ## Kullanım
-- Telegram'da botunuzu bulun ve /start komutunu gönderin.
-- Konumunuzu paylaşın ve bot size en yakın eczaneleri göndersin.
-- "Tümünü Göster" butonuna basarak daha fazla eczane bilgisine erişin.
+
+Kendi botunuzu kullanmak için:
+- Telegram'da oluşturduğunuz botunuzu bulun.
+- Bota "/start" veya kendi ayarladığınız başlangıç komutunu gönderip çalıştığından emin olun.
+- Başarılı şekilde cevap alabilirseniz şimdi de konum bilginizi göndererek eczaneleri bilgilerini almayı deneyebilirsiniz.
+- Eğer mesai saatleri içerisinde iseniz, ilçenizdeki eczanelerin bir kısmını verip "Tümünü Göster" butonu getirecektir. Bu butona tıklayarak tüm eczane bilgilerini listeleyebilirsiniz.
+
+Benim oluşturduğum botu deneyimlemek için https://t.me/EnYakinEczaneBot adresinden botu kullanabilirsiniz.
 
 ## Katkıda Bulunma
-Katkıda bulunmak için lütfen bir pull request oluşturun.
+
+Kodu iyileştirmek, varsa bir hatayı gidermek veya yeni özellikler katmak isterseniz repo'yu clone'layın ve geliştirme sonrası bir Pull Request oluşturun. Desteğiniz için şimdiden teşekkür ederim.
+
+

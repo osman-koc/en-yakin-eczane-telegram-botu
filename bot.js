@@ -46,16 +46,20 @@ bot.on('message', async (msg) => {
                 if (isWorkHour && !isWeekend && !isHoliday) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                 } else {
-                    console.log(`-> Get API - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
-
-                    // Collect API
-                    // nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
-                    // MY API
-                    nearestPharmacies = await fetchPharmacies(city, district);
+                    
+                    if (process.env.USE_COLLECT_API === true) {
+                        // Collect API
+                        console.log(`-> Get CollectAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
+                        nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
+                    } else {
+                        // MY API
+                        console.log(`-> Get MyAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
+                        nearestPharmacies = await fetchPharmacies(city, district);
+                    }
                 }
 
                 if (nearestPharmacies.length > 0) {
-                    if (isWorkHour){
+                    if (isWorkHour) {
                         await bot.sendMessage(chatId, 'İlçenizdeki eczaneler listeleniyor.');
                     } else {
                         await bot.sendMessage(chatId, 'Size en yakın olan nöbetçi eczaneler listeleniyor.');
@@ -65,7 +69,7 @@ bot.on('message', async (msg) => {
                     for (let i = 0; i < initialPharmacies.length; i++) {
                         const pharmacy = initialPharmacies[i];
                         var pharmacyItemMsg = `Eczane adı: ${pharmacy.name}\nAdres: ${pharmacy.address}\nTelefon: ${pharmacy.phone}\n`;
-                        
+
                         if (pharmacy.googleMapsUrl === undefined || pharmacy.googleMapsUrl === null || pharmacy.googleMapsUrl.length < 10) {
                             const addressQuery = queryString.stringify({ query: pharmacy.address });
                             pharmacy.googleMapsUrl = `${process.env.GOOGLE_MAPS_URI}&${addressQuery}`;

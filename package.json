@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Yakındaki veya nöbetçi eczaneleri sorgulamak için Telegram botu",
   "main": "bot.js",
-  "type": "module", 
+  "type": "module",
   "scripts": {
     "start": "node bot.js"
   },
@@ -26,6 +26,7 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "geolib": "^3.3.4",
+    "googleapis": "^140.0.1",
     "node-telegram-bot-api": "^0.63.0",
     "query-string": "^9.0.0"
   }

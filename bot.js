@@ -1,10 +1,11 @@
 import 'dotenv/config';
 import TelegramBot from 'node-telegram-bot-api';
 import { getCityAndDistrictFromLocation } from './api/openstreetmap-api.js';
-// import { fetchNearestPharmacies } from './api/collect-api.js';
+import { fetchNearestPharmacies } from './api/collect-api.js';
 import { fetchPharmacies } from './api/my-api.js';
 import { findPharmaciesFromDb } from './api/find-pharmacies.js';
 import { isPublicHoliday } from './api/holiday-api.js';
+import { appendData } from './api/google-sheets-api.js';
 import queryString from 'query-string';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -25,16 +26,21 @@ bot.on('message', async (msg) => {
         const isWeekend = messageDate.getDay() === 0 || messageDate.getDay() === 6;
         const isHoliday = isPublicHoliday(messageDate);
 
-        await bot.sendMessage(chatId, 'Konum bilginize göre en yakın eczaneler sorgulanıyor.');
-        var locationSuccess = false;
+        await bot.sendMessage(chatId, 'Konum bilgisi sorgulanıyor.');
+        let locationSuccess = false;
 
         const latitude = msg.location.latitude;
         const longitude = msg.location.longitude;
 
         try {
-            const { city, district } = await getCityAndDistrictFromLocation(latitude, longitude);
-            console.log(`-> Request for: ${city} / ${district}`);
-            if (city && district) {
+            const { country_code, city, district } = await getCityAndDistrictFromLocation(latitude, longitude);
+            if (!country_code || country_code.toLowerCase() !== 'tr') {
+                locationSuccess = true;
+                responseMsg = 'Konumunuz Türkiye dışındaki bir ülke olarak tespit edildi. Servisimiz şu an için yalnızca Türkiye içerisindeki eczaneler için hizmet vermektedir. İlginiz için teşekkür ederiz.';
+            }
+            else if (city && district) {
+                console.log(`-> Request for: ${city} / ${district}`);
+
                 locationSuccess = true;
 
                 const userLocation = {
@@ -46,7 +52,6 @@ bot.on('message', async (msg) => {
                 if (isWorkHour && !isWeekend && !isHoliday) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                 } else {
-                    
                     if (process.env.USE_COLLECT_API === true) {
                         // Collect API
                         console.log(`-> Get CollectAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
@@ -93,10 +98,20 @@ bot.on('message', async (msg) => {
                 } else {
                     responseMsg = 'Yakınınızda eczane bulunamadı.';
                 }
+
+                if (process.env.GOOGLE_SHEETS_CREDENTIALS) {
+                    const rowData = [
+                        new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' }),
+                        chatId,
+                        city,
+                        district
+                    ];
+                    await appendData(rowData);
+                }
             }
         } catch (error) {
             console.error('Konum bilgisi alınırken hata oluştu:', error);
-            responseMsg = 'Konum bilgisi alınırken hata oluştu.';
+            responseMsg = 'Servislerde oluşan bir hatadan dolayı şu anda isteğinize yanıt alamadım. Konumu doğru gönderdiğinizden eminseniz tekrar deneyebilirsiniz.';
         }
 
         if (!locationSuccess) {
@@ -114,6 +129,8 @@ bot.on('message', async (msg) => {
         responseMsg = 'pong';
     } else if (toLowerMessage === 'test') {
         responseMsg = 'Sensin test :)';
+    } else if (toLowerMessage.includes('naber') || toLowerMessage.includes('nasılsın')) {
+        responseMsg = 'Size yardımcı olmakla meşgulüm. Ben bir chat botu değil, size yakın olan eczaneleri bulup iletmekle görevliyim. Bu nedenle bu tarz sorularınıza yanıt veremeyebilirim. İlginiz için teşekkür ederim.';
     } else {
         responseMsg = 'Mesajınız anlaşılamadı. Tekrar deneyiniz.'
     }

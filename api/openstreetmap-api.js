@@ -6,8 +6,13 @@ async function getCityAndDistrictFromLocation(latitude, longitude) {
     const locationData = await response.json();
 
     if (!locationData.address) {
-        console.log('-> Request for LocationUrl: ' + locationUrl);
+        console.log('-> Address is empty on Request for LocationUrl: ' + locationUrl);
         throw new Error('Konum bilgisi alınamadı.');
+    }
+
+    const country_code = locationData.address.country_code;
+    if (country_code.toLowerCase() != 'tr'){
+        return { country_code };
     }
 
     let city = locationData.address.province || locationData.address.district || locationData.address.city || locationData.address.village || '';
@@ -25,10 +30,10 @@ async function getCityAndDistrictFromLocation(latitude, longitude) {
     }
 
     if (city === '' || district === '') {
-        console.log('-> Request for LocationUrl: ' + locationUrl);
+        console.log('-> City or District is empty on Request for LocationUrl: ' + locationUrl);
     }
 
-    return { city, district };
+    return { country_code, city, district };
 }
 
 export { getCityAndDistrictFromLocation };

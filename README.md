@@ -20,6 +20,7 @@ Uygulamayı npm ile manuel olarak veya docker üzerinden pull edip run ederek ç
 - NPM (manuel kurulum için) veya Docker
 - Telegram bot token bilgisi
 - Collect API token bilgisi
+- Google API Key bilgisi (isteğe bağlı)
 
 ### Kurulum
 
@@ -37,10 +38,11 @@ Uygulamayı npm ile manuel olarak veya docker üzerinden pull edip run ederek ç
    TELEGRAM_BOT_TOKEN=<your_telegram_bot_token>
    USE_COLLECT_API=true
    COLLECT_API_TOKEN=<your_collect_apikey>
-   COLLECT_API_URI=https://api.collectapi.com/health/dutyPharmacy
-   OPENSTREETMAP_URI=https://nominatim.openstreetmap.org/reverse
-   GOOGLE_MAPS_URI=https://www.google.com/maps/search/?api=1
+   ...
    MY_API_URI=<customapiuri_youcanuse_collectapi_insteadofcustom>
+   GOOGLE_SHEETS_CREDENTIALS=<your_json_credentials>
+   GOOGLE_SHEET_ID=<your_google_sheet_id>
+   GOOGLE_SHEET_RANGE='Usage!A:E'
    ```
 
    Buradaki `MY_API_URI` benim yazdığım başka bir servisin adresi. Bu servis, nöbetçi eczaneleri sunuyor. Henüz stabil olmadığından dolayı dış kullanıma açık değil, bu nedenle de burada bilgilerini paylaşamıyorum. Eğer kendi servisiniz varsa buraya onun adresini koyabilirsiniz. Tabii response için `./api/my-api.js` dosyasını düzenlemeyi unutmayın.
@@ -48,6 +50,8 @@ Uygulamayı npm ile manuel olarak veya docker üzerinden pull edip run ederek ç
    Alternatif olarak, Collect API kullanabilirsiniz. Bunun için de <a href="https://collectapi.com/">collectapi.com</a> adresinde üye olup alacağınız token bilgisini COLLECT_API_TOKEN içerisine yapıştırın. Ardından <a href="https://collectapi.com/tr/api/health/nobetci-eczane-api">buradaki</a> adrese giderek "Ücretlendirme" sekmesinden istediğiniz bir pakete "Subscribe" yani abone olmanız gerekiyor. Bu işlemleri tamamladıktan sonra Collect API'daki nöbetçi eczane servisini kullanabilirsiniz. Bu zaten var olan bir servis, benim yaptığım bir şey değil.
 
    Eğer collect api kullanacaksanız `USE_COLLECT_API` değerini `true` olarak bırakın. Kendi servisinizi kullanacaksanız, bu değeri `false` olarak değiştirin.
+
+   Google Sheet ise kullanım verilerini tutmak için kullanılıyor. Eğer kullanmayacaksanız bu değerleri girmenize gerek yok.
 
 3. Proje dizinine gidin ve bağımlılıkları yükleyin:
 

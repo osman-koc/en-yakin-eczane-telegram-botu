@@ -20,9 +20,9 @@
   "author": "Osman Koç",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/osman-koc/en-yakin-eczaneyi-bul-telegram-botu/issues"
+    "url": "https://github.com/osman-koc/en-yakin-eczane-telegram-botu/issues"
   },
-  "homepage": "https://github.com/osman-koc/en-yakin-eczaneyi-bul-telegram-botu#readme",
+  "homepage": "https://github.com/osman-koc/en-yakin-eczane-telegram-botu#readme",
   "dependencies": {
     "dotenv": "^16.4.5",
     "geolib": "^3.3.4",

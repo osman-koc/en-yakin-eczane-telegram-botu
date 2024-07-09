@@ -10,8 +10,9 @@ async function fetchPharmacies(city, district) {
             }
         });
         const data = await response.json();
-
+        
         if (!Array.isArray(data) || data.length === 0) {
+            console.log(data);
             throw new Error('API request failed or no pharmacies found');
         }
 

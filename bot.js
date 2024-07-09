@@ -24,6 +24,7 @@ bot.on('message', async (msg) => {
         const isWorkHour = hours >= 9 && hours < 18;
         const isWeekend = messageDate.getDay() === 0 || messageDate.getDay() === 6;
         const isHoliday = isPublicHoliday(messageDate);
+        const willGoToApi = isWorkHour && !isWeekend && !isHoliday;
 
         await bot.sendMessage(chatId, 'Konum bilgisi sorgulanıyor.');
         let locationSuccess = false;
@@ -48,22 +49,28 @@ bot.on('message', async (msg) => {
                 };
 
                 let nearestPharmacies;
-                if (isWorkHour && !isWeekend && !isHoliday) {
+                if (willGoToApi) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                 } else {
-                    if (process.env.USE_COLLECT_API === true) {
+                    if (process.env.USE_COLLECT_API === false){
+                        // MY API
+                        console.log(`-> Get MyAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
+                        try {
+                            nearestPharmacies = await fetchPharmacies(city, district);
+                        } catch(error) {
+                            nearestPharmacies = [];
+                        }
+                    }
+                    
+                    if (process.env.USE_COLLECT_API === true || !nearestPharmacies || nearestPharmacies.length === 0) {
                         // Collect API
                         console.log(`-> Get CollectAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
                         nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
-                    } else {
-                        // MY API
-                        console.log(`-> Get MyAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
-                        nearestPharmacies = await fetchPharmacies(city, district);
-                    }
+                    } 
                 }
 
                 if (nearestPharmacies.length > 0) {
-                    if (isWorkHour) {
+                    if (willGoToApi) {
                         await bot.sendMessage(chatId, 'İlçenizdeki eczaneler listeleniyor.');
                     } else {
                         await bot.sendMessage(chatId, 'Size en yakın olan nöbetçi eczaneler listeleniyor.');
@@ -98,15 +105,17 @@ bot.on('message', async (msg) => {
                     responseMsg = 'Yakınınızda eczane bulunamadı.';
                 }
 
-                if (process.env.MY_API_URI) {
-                    const rowData = {
-                        date: new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' }),
-                        chatId,
-                        city,
-                        district
-                    };
-                    await appendUsageDataToGoogleSheets(rowData);
-                }
+                try{
+                    if (process.env.MY_API_URI) {
+                        const rowData = {
+                            date: new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' }),
+                            chatId,
+                            city,
+                            district
+                        };
+                        await appendUsageDataToGoogleSheets(rowData);
+                    }
+                } catch(error) {}
             }
         } catch (error) {
             console.error('Hata oluştu:', error);

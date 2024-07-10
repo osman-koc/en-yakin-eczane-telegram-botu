@@ -48,28 +48,31 @@ bot.on('message', async (msg) => {
                     longitude: msg.location.longitude
                 };
 
+                async function getDataFromCollectApi() {
+                    console.log(`-> Get CollectAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
+                    nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
+                }
+
                 let nearestPharmacies;
                 if (willGoToApi) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                 } else {
-                    if (process.env.USE_COLLECT_API === false){
+                    if (process.env.USE_COLLECT_API === "false") {
+                        // Collect API
+                        await getDataFromCollectApi();
+                    } else {
                         // MY API
                         console.log(`-> Get MyAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
                         try {
                             nearestPharmacies = await fetchPharmacies(city, district);
-                        } catch(error) {
-                            nearestPharmacies = [];
+                        } catch (error) {
+                            console.log(error);
+                            await getDataFromCollectApi();
                         }
                     }
-                    
-                    if (process.env.USE_COLLECT_API === true || !nearestPharmacies || nearestPharmacies.length === 0) {
-                        // Collect API
-                        console.log(`-> Get CollectAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
-                        nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
-                    } 
                 }
 
-                if (nearestPharmacies.length > 0) {
+                if (nearestPharmacies && nearestPharmacies.length > 0) {
                     if (willGoToApi) {
                         await bot.sendMessage(chatId, 'İlçenizdeki eczaneler listeleniyor.');
                     } else {
@@ -102,10 +105,10 @@ bot.on('message', async (msg) => {
                         bot.context = { remainingPharmacies: nearestPharmacies.slice(5) };
                     }
                 } else {
-                    responseMsg = 'Yakınınızda eczane bulunamadı.';
+                    responseMsg = 'Yakınınızda eczane bulunamadı veya konum bilgisinde bir hata var.';
                 }
 
-                try{
+                try {
                     if (process.env.MY_API_URI) {
                         const rowData = {
                             date: new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' }),
@@ -115,7 +118,7 @@ bot.on('message', async (msg) => {
                         };
                         await appendUsageDataToGoogleSheets(rowData);
                     }
-                } catch(error) {}
+                } catch (error) { }
             }
         } catch (error) {
             console.error('Hata oluştu:', error);

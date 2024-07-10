@@ -25,6 +25,7 @@ bot.on('message', async (msg) => {
         const isWeekend = messageDate.getDay() === 0 || messageDate.getDay() === 6;
         const isHoliday = isPublicHoliday(messageDate);
         const willGoToApi = isWorkHour && !isWeekend && !isHoliday;
+        const useCollectApi = process.env.USE_COLLECT_API === 'true';
 
         await bot.sendMessage(chatId, 'Konum bilgisi sorgulanıyor.');
         let locationSuccess = false;
@@ -57,7 +58,7 @@ bot.on('message', async (msg) => {
                 if (willGoToApi) {
                     nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                 } else {
-                    if (process.env.USE_COLLECT_API === "false") {
+                    if (useCollectApi) {
                         // Collect API
                         await getDataFromCollectApi();
                     } else {

@@ -10,6 +10,22 @@ import queryString from 'query-string';
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 
+const handleError = async (error, chatId) => {
+    if (error.code === 'ETELEGRAM' && error.response && error.response.statusCode === 429) {
+        const retryAfter = error.response.parameters.retry_after;
+        console.log(`429 Too Many Requests. Retry after ${retryAfter} seconds.`);
+        await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+    } else if (error.code === 'ETELEGRAM' && error.response && error.response.statusCode === 502) {
+        console.log('502 Bad Gateway. Retrying in 5 seconds.');
+        await new Promise(resolve => setTimeout(resolve, 5000));
+    } else {
+        console.error('Error:', error);
+        if (chatId) {
+            await bot.sendMessage(chatId, 'Bir hata oluştu, lütfen tekrar deneyin.');
+        }
+    }
+};
+
 bot.on('message', async (msg) => {
     try {
         const chatId = msg.chat.id;
@@ -134,8 +150,8 @@ bot.on('message', async (msg) => {
             responseMsg = 'Hoş geldiniz!\n\nKonumunuzu bota gönderin ve size en yakın olan eczaneleri bulup göndersin.\n\nNot: Bilgileriniz hiçbir yerde kayıt edilmemektedir.';
         } else if (toLowerMessage === '/yardim' || toLowerMessage === '/help') {
             responseMsg = 'Bu bot konumunuza göre size en yakın eczane bilgilerini bulup göndermeye yarar. Bunun için mevcut konumunuzu bota göndermeniz yeterli. Konum bilginiz hiçbir yerde kayıt edilmemektedir.'
-        } else if (toLowerMessage.includes('gelistirici') || toLowerMessage.includes('geliştirici') || toLowerMessage.includes('geliştiren') || toLowerMessage.includes('yazılımcı')) {
-            responseMsg = 'Bu bot, Osman Koç tarafından geliştirildi. İletişim için info@osmkoc.com adresine mail atabilirsiniz.'
+        } else if (toLowerMessage === '/developer') {
+            responseMsg = 'Bu bot [Osman Koç](https://osmkoc.com/) tarafından geliştirilmiştir.\n\nEğer bir sorun yaşıyorsanız veya öneriniz varsa info@osmkoc.com adresine mail olarak iletebilirsiniz.';
         } else if (toLowerMessage === '/contact') {
             responseMsg = 'Bir hata veya öneri bildirmek isterseniz info@osmkoc.com adresine mail gönderebilirsiniz. Şimdiden teşekkürler!'
         } else if (toLowerMessage === 'ping') {
@@ -144,38 +160,49 @@ bot.on('message', async (msg) => {
             responseMsg = 'Sensin test :)';
         } else if (toLowerMessage.includes('naber') || toLowerMessage.includes('nasılsın')) {
             responseMsg = 'Size yardımcı olmakla meşgulüm. Ben bir chat botu değil, size yakın olan eczaneleri bulup iletmekle görevliyim. Bu nedenle bu tarz sorularınıza yanıt veremeyebilirim. İlginiz için teşekkür ederim.';
-        } else {
-            responseMsg = 'Mesajınız anlaşılamadı. Tekrar deneyiniz.'
         }
 
-        if (responseMsg != '') {
+        if (responseMsg !== '') {
             await bot.sendMessage(chatId, responseMsg, { parse_mode: 'HTML' });
         }
     } catch (error) {
-        console.log(error);
+        await handleError(error, msg.chat.id);
     }
 });
 
 bot.on('callback_query', async (callbackQuery) => {
-    try {
-        const message = callbackQuery.message;
-        const chatId = message.chat.id;
+    const chatId = callbackQuery.message.chat.id;
+    //const messageId = callbackQuery.message.message_id;
+    const data = callbackQuery.data;
 
-        if (callbackQuery.data === 'show_more_pharmacies') {
-            const remainingPharmacies = bot.context?.remainingPharmacies || [];
+    if (data === 'show_more_pharmacies' && bot.context && bot.context.remainingPharmacies) {
+        const remainingPharmacies = bot.context.remainingPharmacies;
+        bot.context.remainingPharmacies = remainingPharmacies.slice(5); // Update remaining pharmacies
 
-            for (let i = 0; i < remainingPharmacies.length; i++) {
-                const pharmacy = remainingPharmacies[i];
-                const locationLink = `<a href="${pharmacy.googleMapsUrl}">Haritada göster</a>`;
-                await bot.sendMessage(chatId, `Eczane adı: ${pharmacy.name}\nAdres: ${pharmacy.address}\nTelefon: ${pharmacy.phone}\n${locationLink}`, { parse_mode: 'HTML' });
-                if (i < remainingPharmacies.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                }
+        for (let i = 0; i < Math.min(5, remainingPharmacies.length); i++) {
+            const pharmacy = remainingPharmacies[i];
+            var pharmacyItemMsg = `Eczane adı: ${pharmacy.name}\nAdres: ${pharmacy.address}\nTelefon: ${pharmacy.phone}\n`;
+
+            if (pharmacy.googleMapsUrl === undefined || pharmacy.googleMapsUrl === null || pharmacy.googleMapsUrl.length < 10) {
+                const addressQuery = queryString.stringify({ query: pharmacy.address });
+                pharmacy.googleMapsUrl = `${process.env.GOOGLE_MAPS_URI}&${addressQuery}`;
             }
 
+            pharmacyItemMsg += `<a href="${pharmacy.googleMapsUrl}">Haritada göster</a>`;
+            await bot.sendMessage(chatId, pharmacyItemMsg, { parse_mode: 'HTML' });
+            if (i < Math.min(5, remainingPharmacies.length) - 1) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        if (bot.context.remainingPharmacies.length > 0) {
+            await bot.sendMessage(chatId, 'Daha fazla eczane görmek için tekrar "Daha Fazla Göster" butonuna tıklayın.', {
+                reply_markup: {
+                    inline_keyboard: [[{ text: 'Daha Fazla Göster', callback_data: 'show_more_pharmacies' }]]
+                }
+            });
+        } else {
             bot.context = {};
         }
-    } catch (error) {
-        console.log(error);
     }
 });

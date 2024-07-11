@@ -114,9 +114,9 @@ bot.on('message', async (msg) => {
                             }
                         }
                         if (nearestPharmacies.length > 5) {
-                            await bot.sendMessage(chatId, `${city}/${district} için toplam ${nearestPharmacies.length} eczane bulundu. Diğer eczaneleri görmek için "Tümünü Göster" butonuna tıklayın.`, {
+                            await bot.sendMessage(chatId, `${city}/${district} için toplam ${nearestPharmacies.length} eczane bulundu. Diğer eczaneleri görmek için "Daha Fazla Göster" butonuna tıklayın.`, {
                                 reply_markup: {
-                                    inline_keyboard: [[{ text: 'Tümünü Göster', callback_data: 'show_more_pharmacies' }]]
+                                    inline_keyboard: [[{ text: 'Daha Fazla Göster', callback_data: 'show_more_pharmacies' }]]
                                 }
                             });
                             // Save remaining pharmacies in a session variable or a temporary storage

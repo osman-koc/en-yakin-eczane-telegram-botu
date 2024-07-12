@@ -41,7 +41,7 @@ bot.on('message', async (msg) => {
             const isWorkHour = hours >= 9 && hours < 18;
             const isWeekend = messageDate.getDay() === 0 || messageDate.getDay() === 6;
             const isHoliday = isPublicHoliday(messageDate);
-            const willGoToApi = isWorkHour && !isWeekend && !isHoliday;
+            const willGoToDb = isWorkHour && !isWeekend && !isHoliday;
             const useCollectApi = process.env.USE_COLLECT_API === 'true';
 
             await bot.sendMessage(chatId, 'Konum bilgisi sorgulanıyor.');
@@ -72,7 +72,7 @@ bot.on('message', async (msg) => {
                     }
 
                     let nearestPharmacies;
-                    if (willGoToApi) {
+                    if (willGoToDb) {
                         nearestPharmacies = await findPharmaciesFromDb(city, district, userLocation);
                     } else {
                         if (useCollectApi) {
@@ -91,7 +91,7 @@ bot.on('message', async (msg) => {
                     }
 
                     if (nearestPharmacies && nearestPharmacies.length > 0) {
-                        if (willGoToApi) {
+                        if (willGoToDb) {
                             await bot.sendMessage(chatId, 'İlçenizdeki eczaneler listeleniyor.');
                         } else {
                             await bot.sendMessage(chatId, 'Size en yakın olan nöbetçi eczaneler listeleniyor.');

@@ -17,9 +17,10 @@ async function findPharmaciesFromDb(city, district, userLocation) {
     // Her eczane için merkezden uzaklık hesapla ve sırala
     const pharmaciesWithDistances = filteredPharmacies.map(pharmacy => {
         const pharmacyLocation = {
-            latitude: parseFloat(pharmacy.lat),
-            longitude: parseFloat(pharmacy.lon)
+            latitude: parseFloat(pharmacy.location.lat),
+            longitude: parseFloat(pharmacy.location.lon)
         };
+        console.log(pharmacyLocation);
 
         const addressQuery = queryString.stringify({ query: pharmacy.address });
         const googleMapsUrl = `${process.env.GOOGLE_MAPS_URI}&${addressQuery}`;

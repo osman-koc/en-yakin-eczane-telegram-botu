@@ -12,6 +12,7 @@ async function getCityAndDistrictFromLocation(latitude, longitude) {
 
     const country_code = locationData.address.country_code;
     if (country_code.toLowerCase() != 'tr'){
+        console.log('-> Country code is not TR on Request for LocationUrl: ' + locationUrl);
         return { country_code };
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "enyakineczanebot",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Yakındaki veya nöbetçi eczaneleri sorgulamak için Telegram botu",
   "type": "module",
   "repository": {

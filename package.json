@@ -1,12 +1,8 @@
 {
   "name": "enyakineczanebot",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Yakındaki veya nöbetçi eczaneleri sorgulamak için Telegram botu",
-  "main": "bot.js",
   "type": "module",
-  "scripts": {
-    "start": "node bot.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/osman-koc/en-yakin-eczane-telegram-botu.git"
@@ -26,7 +22,6 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "geolib": "^3.3.4",
-    "node-telegram-bot-api": "^0.63.0",
     "query-string": "^9.0.0"
   }
 }

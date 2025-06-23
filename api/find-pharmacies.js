@@ -1,7 +1,9 @@
 import 'dotenv/config';
 import geolib from 'geolib';
 import queryString from 'query-string';
-import pharmaciesData from '../db/pharmacies.json' assert { type: 'json' };
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pharmaciesData = require('../db/pharmacies.json');
 
 // Kullanıcı konumunu alıp il ve ilçeye göre eczaneleri bulan fonksiyon
 async function findPharmaciesFromDb(city, district, userLocation) {

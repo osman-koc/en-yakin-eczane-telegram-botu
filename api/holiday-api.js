@@ -1,4 +1,6 @@
-import holidaysData from '../db/holidays.json' assert { type: 'json' };
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const holidaysData = require('../db/holidays.json');
 
 function isPublicHoliday(date) {
     const holidays = holidaysData.holidays;

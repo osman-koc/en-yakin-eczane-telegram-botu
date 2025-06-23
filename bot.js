@@ -151,9 +151,9 @@ bot.on('message', async (msg) => {
         } else if (toLowerMessage === '/yardim' || toLowerMessage === '/help') {
             responseMsg = 'Bu bot konumunuza göre size en yakın eczane bilgilerini bulup göndermeye yarar. Bunun için mevcut konumunuzu bota göndermeniz yeterli. Konum bilginiz hiçbir yerde kayıt edilmemektedir.'
         } else if (toLowerMessage === '/developer') {
-            responseMsg = 'Bu bot [Osman Koç](https://osmkoc.com/) tarafından geliştirilmiştir.\n\nEğer bir sorun yaşıyorsanız veya öneriniz varsa info@osmkoc.com adresine mail olarak iletebilirsiniz.';
+            responseMsg = 'Bu bot [Osman Koç](https://osmankoc.dev/) tarafından geliştirilmiştir.\n\nEğer bir sorun yaşıyorsanız veya öneriniz varsa info@oosmankoc.dev adresine mail olarak iletebilirsiniz.';
         } else if (toLowerMessage === '/contact') {
-            responseMsg = 'Bir hata veya öneri bildirmek isterseniz info@osmkoc.com adresine mail gönderebilirsiniz. Şimdiden teşekkürler!'
+            responseMsg = 'Bir hata veya öneri bildirmek isterseniz info@osmankoc.dev adresine mail gönderebilirsiniz. Şimdiden teşekkürler!'
         } else if (toLowerMessage === 'ping') {
             responseMsg = 'pong';
         } else if (toLowerMessage === 'test') {

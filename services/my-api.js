@@ -1,7 +1,7 @@
 import 'dotenv/config';
 
 async function fetchPharmacies(city, district) {
-    const url = `${process.env.MY_API_URI}/pharmacies/${encodeURIComponent(city)}/${encodeURIComponent(district)}`;
+    const url = `${process.env.MY_API_URI}/pharmacies?city=${encodeURIComponent(city)}&district=${encodeURIComponent(district)}`;
 
     try {
         const headers = {
@@ -13,13 +13,17 @@ async function fetchPharmacies(city, district) {
         const response = await fetch(url, {
             headers
         });
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('API non-JSON response:', text);
+            throw new Error('API non-JSON response');
+        }
         const data = await response.json();
-        
         if (!Array.isArray(data) || data.length === 0) {
-            console.log(data);
+            console.log('API response (empty or not array):', data);
             throw new Error('API request failed or no pharmacies found');
         }
-
         return data;
     } catch (error) {
         console.error('Error fetching pharmacies:', error);

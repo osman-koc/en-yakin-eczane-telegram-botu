@@ -4,10 +4,14 @@ async function fetchPharmacies(city, district) {
     const url = `${process.env.MY_API_URI}/pharmacies/${encodeURIComponent(city)}/${encodeURIComponent(district)}`;
 
     try {
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        if (process.env.MY_API_KEY) {
+            headers['x-api-key'] = process.env.MY_API_KEY;
+        }
         const response = await fetch(url, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers
         });
         const data = await response.json();
         
@@ -28,11 +32,15 @@ async function appendUsageDataToGoogleSheets(logData) {
     const url = `${process.env.MY_API_URI}/append-to-google-sheets`;
 
     try {
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        if (process.env.MY_API_KEY) {
+            headers['x-api-key'] = process.env.MY_API_KEY;
+        }
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers,
             body: JSON.stringify({ logData })
         });
 

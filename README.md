@@ -38,7 +38,8 @@ Uygulamayı npm ile manuel olarak veya docker üzerinden pull edip run ederek ç
    USE_COLLECT_API=true
    COLLECT_API_TOKEN=<your_collect_apikey>
    ...
-   MY_API_URI=<customapiuri_youcanuse_collectapi_insteadofcustom>
+   MY_API_URI=<customapi_uri_youcanuse_collectapi_insteadofcustom>
+   MY_API_KEY=<customapi_key_youcanuse_collectapi_insteadofcustom>
    ```
 
    Buradaki `MY_API_URI` benim yazdığım başka bir servisin adresi. Bu servis, nöbetçi eczaneleri sunuyor. Henüz stabil olmadığından dolayı dış kullanıma açık değil, bu nedenle de burada bilgilerini paylaşamıyorum. Eğer kendi servisiniz varsa buraya onun adresini koyabilirsiniz. Tabii response için `./api/my-api.js` dosyasını düzenlemeyi unutmayın.

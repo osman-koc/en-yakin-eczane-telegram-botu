@@ -21,7 +21,7 @@ bot.use(session({
   initial: initialSession
 }));
 
-export default webhookCallback(bot, 'http');
+export default (req, res) => webhookCallback(bot, 'http')(req, res);
 
 // Mesaj handler
 bot.on('message', async (ctx) => {
@@ -33,7 +33,7 @@ bot.on('message', async (ctx) => {
 
     if (ctx.message.location) {
       const messageDate = new Date(ctx.message.date * 1000);
-      const hours = messageDate.toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', hour12: false, hour: 'numeric' });
+      const hours = parseInt(messageDate.toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', hour12: false, hour: 'numeric' }), 10);
 
       const isWorkHour = hours >= 9 && hours < 18;
       const isWeekend = messageDate.getDay() === 0 || messageDate.getDay() === 6;
@@ -81,7 +81,7 @@ bot.on('message', async (ctx) => {
               try {
                 nearestPharmacies = await fetchPharmacies(city, district);
               } catch (error) {
-                console.log(error);
+                console.log(`-> MyAPI failed (${error.message}), falling back to CollectAPI`);
                 await getDataFromCollectApi();
               }
             }
@@ -225,3 +225,5 @@ bot.on('callback_query:data', async (ctx) => {
     }
   }
 });
+
+export { bot };

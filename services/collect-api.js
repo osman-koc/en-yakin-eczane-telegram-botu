@@ -12,10 +12,14 @@ async function fetchNearestPharmacies(city, district, userLocation) {
 
     try {
         const response = await fetch(url, { headers });
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error(`CollectAPI non-JSON response (HTTP ${response.status})`);
+        }
         const data = await response.json();
 
         if (!data.success) {
-            throw new Error('API request failed');
+            throw new Error(`CollectAPI request failed: ${data.message || JSON.stringify(data)}`);
         }
 
         const pharmacies = data.result;
@@ -39,7 +43,6 @@ async function fetchNearestPharmacies(city, district, userLocation) {
 
         return nearestPharmacies;
     } catch (error) {
-        console.error('Error fetching pharmacies:', error);
         throw error;
     }
 }

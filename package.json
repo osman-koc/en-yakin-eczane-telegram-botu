@@ -19,6 +19,9 @@
     "url": "https://github.com/osman-koc/en-yakin-eczane-telegram-botu/issues"
   },
   "homepage": "https://github.com/osman-koc/en-yakin-eczane-telegram-botu#readme",
+  "scripts": {
+    "start": "node bot.js"
+  },
   "dependencies": {
     "dotenv": "^16.4.5",
     "geolib": "^3.3.4",

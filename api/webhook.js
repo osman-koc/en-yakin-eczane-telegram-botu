@@ -6,7 +6,7 @@ import { findPharmaciesFromDb } from '../services/find-pharmacies.js';
 import { isPublicHoliday } from '../services/holiday-api.js';
 import { logger } from '../services/logger.js';
 import queryString from 'query-string';
-import { Bot, webhookCallback, session } from 'grammy';
+import { Bot, session } from 'grammy';
 
 const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
@@ -21,8 +21,6 @@ function initialSession() {
 bot.use(session({
   initial: initialSession
 }));
-
-export default (req, res) => webhookCallback(bot, 'http')(req, res);
 
 // Mesaj handler
 bot.on('message', async (ctx) => {

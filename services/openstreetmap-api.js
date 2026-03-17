@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { logger } from './logger.js';
 
 async function getCityAndDistrictFromLocation(latitude, longitude) {
     const locationUrl = `${process.env.OPENSTREETMAP_URI}?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`;
@@ -27,7 +28,7 @@ async function getCityAndDistrictFromLocation(latitude, longitude) {
             const locationData = await response.json();
 
             if (!locationData.address) {
-                console.log('-> Address is empty on Request for LocationUrl: ' + locationUrl);
+                logger.warn('OpenStreetMap empty address: ' + locationUrl);
                 throw new Error('Konum bilgisi alınamadı.');
             }
 
@@ -51,13 +52,13 @@ async function getCityAndDistrictFromLocation(latitude, longitude) {
             }
 
             if (city === '' || district === '') {
-                console.log('-> City or District is empty on Request for LocationUrl: ' + locationUrl);
+                logger.warn(`OpenStreetMap empty city/district: lat=${latitude} lon=${longitude}`);
             }
 
             return { country_code, city, district };
         } catch (error) {
             lastError = error;
-            console.error(`Attempt ${attempt} failed: ${error.message}`);
+            logger.error(`OpenStreetMap attempt ${attempt}/${maxRetries} failed: ${error.message}`);
             if (attempt === maxRetries) {
                 throw new Error(`Failed to fetch location data after ${maxRetries} attempts: ${error.message}`);
             }

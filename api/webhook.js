@@ -4,6 +4,7 @@ import { fetchNearestPharmacies } from '../services/collect-api.js';
 import { fetchPharmacies, appendUsageDataToGoogleSheets } from '../services/my-api.js';
 import { findPharmaciesFromDb } from '../services/find-pharmacies.js';
 import { isPublicHoliday } from '../services/holiday-api.js';
+import { logger } from '../services/logger.js';
 import queryString from 'query-string';
 import { Bot, webhookCallback, session } from 'grammy';
 
@@ -54,7 +55,7 @@ bot.on('message', async (ctx) => {
           responseMsg = 'Konumunuz Türkiye dışındaki bir ülke olarak tespit edildi. Servisimiz şu an için yalnızca Türkiye içerisindeki eczaneler için hizmet vermektedir. İlginiz için teşekkür ederiz.';
         }
         else if (city && district) {
-          console.log(`-> Request for: ${city} / ${district}`);
+          logger.info(`Location request: ${city} / ${district}`, chatId);
 
           locationSuccess = true;
 
@@ -64,7 +65,7 @@ bot.on('message', async (ctx) => {
           };
 
           async function getDataFromCollectApi() {
-            console.log(`-> Get CollectAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
+            logger.debug(`Querying CollectAPI | hours:${hours} isWorkHour:${isWorkHour} isWeekend:${isWeekend} isHoliday:${isHoliday}`, chatId);
             nearestPharmacies = await fetchNearestPharmacies(city, district, userLocation);
           }
 
@@ -77,11 +78,11 @@ bot.on('message', async (ctx) => {
               await getDataFromCollectApi();
             } else {
               // MY API
-              console.log(`-> Get MyAPI - hours:${hours}, isWorkHour:${isWorkHour}, isWeekend:${isWeekend}, isHoliday:${isHoliday}`);
+              logger.debug(`Querying MyAPI | hours:${hours} isWorkHour:${isWorkHour} isWeekend:${isWeekend} isHoliday:${isHoliday}`, chatId);
               try {
                 nearestPharmacies = await fetchPharmacies(city, district);
               } catch (error) {
-                console.log(`-> MyAPI failed (${error.message}), falling back to CollectAPI`);
+                logger.warn(`MyAPI failed (${error.message}), falling back to CollectAPI`, chatId);
                 await getDataFromCollectApi();
               }
             }
@@ -143,7 +144,7 @@ bot.on('message', async (ctx) => {
           } catch (error) { }
         }
       } catch (error) {
-        console.error('Hata oluştu:', error);
+        logger.error(`Unhandled error: ${error.message}`, chatId);
         responseMsg = 'Servislerde oluşan bir hatadan dolayı şu anda isteğinize yanıt alamadım. Konumu doğru gönderdiğinizden eminseniz tekrar deneyebilirsiniz.';
       }
 
@@ -170,7 +171,7 @@ bot.on('message', async (ctx) => {
       await ctx.reply(responseMsg, { parse_mode: 'HTML' });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(`Unexpected error: ${error.message}`, ctx.chat?.id);
     await ctx.reply('Bir hata oluştu, lütfen tekrar deneyin.');
   }
 });

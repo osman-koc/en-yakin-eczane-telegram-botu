@@ -30,7 +30,7 @@ async function findPharmaciesFromDb(city, district, userLocation) {
             latitude: parseFloat(pharmacy.location.lat),
             longitude: parseFloat(pharmacy.location.lon)
         };
-        //console.log(pharmacyLocation);
+
 
         const addressQuery = queryString.stringify({ query: pharmacy.address });
         const googleMapsUrl = `${process.env.GOOGLE_MAPS_URI}&${addressQuery}`;

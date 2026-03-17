@@ -1,96 +1,140 @@
 # En Yakın Eczane Telegram Botu
 
-Bu proje, kullanıcının konumuna göre en yakın eczaneleri bulan ve Telegram botu olarak hizmet veren bir uygulamadır. Nöbetçi eczaneleri sorgulamak için Collect API'sini ve çalışma saatlerinde yerel veritabanını kullanır.
+Bu proje, kullanıcının konumuna göre en yakın eczaneleri bulan ve Telegram botu olarak hizmet veren bir uygulamadır. Mesai saatlerinde (hafta içi 09:00–18:00, resmi tatil günleri hariç) yerel veritabanını, diğer zamanlarda ise nöbetçi eczane sorgusunu (Collect API veya özel API) kullanır.
 
 `./db/pharmacies.json` içerisinde Türkiye'deki tüm eczanelerin listesini bulabilirsiniz. Bu veri setini ayrıca projelerinizde (kaynak göstermek şartıyla) kullanabilirsiniz.
 
-## Kullanım
+## Canlı Bot
 
 Telegram hesabınız varsa kullanıcı arama kısmına `En Yakın Eczaneyi Bul` yazarak veya aşağıdaki linkten bota ulaşabilirsiniz:
 https://t.me/EnYakinEczaneBot
 
 <a href="https://t.me/EnYakinEczaneBot"><img src="./img/bot-logo.jpg" width="150" /></a>
 
+## Nasıl Çalışır?
+
+1. Kullanıcı Telegram üzerinden konum bilgisini bota iletir.
+2. Bot, OpenStreetMap Nominatim API aracılığıyla koordinatları il/ilçeye dönüştürür.
+3. Mesai saatlerinde (`hafta içi 09:00–18:00`, resmi tatil değilse) konum ilçesindeki tüm eczaneler yerel veritabanından (`./db/pharmacies.json`) listelenir ve en yakından uzağa sıralanır.
+4. Mesai saatleri dışında nöbetçi eczaneler Collect API veya özel API üzerinden sorgulanır.
+5. İlk 5 eczane doğrudan listelenir; daha fazlası varsa **"Daha Fazla Göster"** butonu sunulur.
+
 ## Başlangıç
 
-Uygulamayı npm ile manuel olarak veya docker üzerinden pull edip run ederek çalıştırmanız mümkün.
+Uygulamayı Node.js ile manuel olarak veya Docker üzerinden çalıştırabilirsiniz.
 
 ### Gereksinimler
 
-- NPM (manuel kurulum için) veya Docker
-- Telegram bot token bilgisi
-- Collect API token bilgisi
+- **Node.js 20+** ve npm (manuel kurulum için)
+- **Docker** (Docker ile kurulum için)
+- Telegram bot token'ı ([BotFather](https://t.me/BotFather) üzerinden alınır)
+- Collect API token'ı (nöbetçi eczane sorgusu için, isteğe bağlı)
 
 ### Kurulum
 
 #### Manuel Kurulum
 
-1. Proje dizinine gidin ve bağımlılıkları yükleyin:
+1. Bağımlılıkları yükleyin:
 
    ```bash
    npm install
    ```
 
-2. `.env.example` dosyasını `.env` olarak yeniden adlandırın ve aşağıdaki bilgileri düzenleyin:
+2. Proje dizininde bir `.env` dosyası oluşturun ve aşağıdaki değişkenleri düzenleyin:
 
-   ```bash
-   TELEGRAM_BOT_TOKEN=<your_telegram_bot_token>
+   ```env
+   TELEGRAM_BOT_TOKEN=<telegram_bot_tokeniniz>
+
+   # Nöbetçi eczane API seçimi
+   # true  → Collect API kullanılır
+   # false → MY_API_URI ile tanımlanan özel API kullanılır
    USE_COLLECT_API=true
-   COLLECT_API_TOKEN=<your_collect_apikey>
-   ...
-   MY_API_URI=<customapi_uri_youcanuse_collectapi_insteadofcustom>
-   MY_API_KEY=<customapi_key_youcanuse_collectapi_insteadofcustom>
+
+   # Collect API (https://collectapi.com)
+   COLLECT_API_TOKEN=<collect_api_tokeniniz>
+   COLLECT_API_URI=https://api.collectapi.com/health/dutyPharmacy
+
+   # Özel API (USE_COLLECT_API=false ise kullanılır)
+   MY_API_URI=<ozel_api_adresi>
+   MY_API_KEY=<ozel_api_anahtari>
+
+   # Dış servisler (varsayılan değerler aşağıdadır)
+   OPENSTREETMAP_URI=https://nominatim.openstreetmap.org/reverse
+   GOOGLE_MAPS_URI=https://www.google.com/maps/search/?api=1
    ```
 
-   Buradaki `MY_API_URI` benim yazdığım başka bir servisin adresi. Bu servis, nöbetçi eczaneleri sunuyor. Henüz stabil olmadığından dolayı dış kullanıma açık değil, bu nedenle de burada bilgilerini paylaşamıyorum. Eğer kendi servisiniz varsa buraya onun adresini koyabilirsiniz. Tabii response için `./api/my-api.js` dosyasını düzenlemeyi unutmayın.
+   > **Collect API hakkında:** [collectapi.com](https://collectapi.com) adresinde üye olup token alın, ardından [Nöbetçi Eczane API](https://collectapi.com/tr/api/health/nobetci-eczane-api) sayfasından bir pakete abone olun.
+   >
+   > **Özel API hakkında:** Kendi nöbetçi eczane servisiniz varsa `MY_API_URI` ve `MY_API_KEY` değerlerini doldurun; `USE_COLLECT_API` değerini `false` yapın. Response formatı için `./services/my-api.js` dosyasını güncellemeyi unutmayın.
 
-   Alternatif olarak, Collect API kullanabilirsiniz. Bunun için de <a href="https://collectapi.com/">collectapi.com</a> adresinde üye olup alacağınız token bilgisini COLLECT_API_TOKEN içerisine yapıştırın. Ardından <a href="https://collectapi.com/tr/api/health/nobetci-eczane-api">buradaki</a> adrese giderek "Ücretlendirme" sekmesinden istediğiniz bir pakete "Subscribe" yani abone olmanız gerekiyor. Bu işlemleri tamamladıktan sonra Collect API'daki nöbetçi eczane servisini kullanabilirsiniz. Bu zaten var olan bir servis, benim yaptığım bir şey değil.
-
-   Eğer collect api kullanacaksanız `USE_COLLECT_API` değerini `true` olarak bırakın. Kendi servisinizi kullanacaksanız, bu değeri `false` olarak değiştirin.
-
-3. Proje dizinine gidin ve bağımlılıkları yükleyin:
+3. Botu başlatın:
 
    ```bash
-   npm run start
+   npm start
    ```
 
 #### Docker Kullanarak
 
-Repo'yu indirerek Dockerfile üzerinden yapmak için manuel kurulumdaki env adımını aynı şekilde uygulamalısınız.
+**Repo'dan imaj oluşturup çalıştırmak için:**
 
-1. Proje dizinine gidin ve Docker imajını oluşturun:
+1. Docker imajını derleyin (multi-stage, distroless runtime):
 
    ```bash
    docker build -t en-yakin-eczane-telegram-botu .
    ```
 
-2. Docker imajını çalıştırın:
+2. İmajı çalıştırın:
 
    ```bash
-   docker run -d --name eczane-botu en-yakin-eczane-telegram-botu
+   docker run -d --name eczane-botu \
+     -e TELEGRAM_BOT_TOKEN="<telegram_bot_tokeniniz>" \
+     -e USE_COLLECT_API="true" \
+     -e COLLECT_API_TOKEN="<collect_api_tokeniniz>" \
+     en-yakin-eczane-telegram-botu
    ```
 
-Repo'yu indirmeden Docker Hub üzerinden image'ı indirip çalıştırmak için:
+**Docker Hub üzerinden hazır imajı indirip çalıştırmak için:**
 
    ```bash
-   docker run -d \
-   -e TELEGRAM_BOT_TOKEN="<token_degerini_buraya_girin>" \
-   -e COLLECT_API_TOKEN="<token_degerini_buraya_girin>" \
-   byengineer/en-yakin-eczane-telegram-botu:master
+   docker run -d --name eczane-botu \
+     -e TELEGRAM_BOT_TOKEN="<telegram_bot_tokeniniz>" \
+     -e USE_COLLECT_API="true" \
+     -e COLLECT_API_TOKEN="<collect_api_tokeniniz>" \
+     byengineer/en-yakin-eczane-telegram-botu:master
    ```
 
 ## Kullanım
 
-Kendi botunuzu kullanmak için:
-- Telegram'da oluşturduğunuz botunuzu bulun.
-- Bota "/start" veya kendi ayarladığınız başlangıç komutunu gönderip çalıştığından emin olun.
-- Başarılı şekilde cevap alabilirseniz şimdi de konum bilginizi göndererek eczaneleri bilgilerini almayı deneyebilirsiniz.
-- Eğer mesai saatleri içerisinde iseniz, ilçenizdeki eczanelerin bir kısmını verip "Tümünü Göster" butonu getirecektir. Bu butona tıklayarak tüm eczane bilgilerini listeleyebilirsiniz.
+Kendi botunuzu ayağa kaldırdıktan sonra:
 
-Benim oluşturduğum botu deneyimlemek için https://t.me/EnYakinEczaneBot adresinden botu kullanabilirsiniz.
+1. Telegram'da oluşturduğunuz botu açın ve `/start` mesajı gönderin.
+2. Konum paylaş butonunu kullanarak mevcut konumunuzu bota iletin.
+3. Bot, bulunduğunuz il/ilçeye göre en yakın eczaneleri listeler.
+   - **Mesai saati içindeyseniz:** İlçenizdeki tüm eczaneler yerel veritabanından listelenir.
+   - **Mesai saati dışındaysanız:** Nöbetçi eczaneler API üzerinden sorgulanır.
+4. İlk 5 eczane listelenir; daha fazlası varsa **"Daha Fazla Göster"** butonuna tıklayarak geri kalan eczaneleri görebilirsiniz.
+
+## Proje Yapısı
+
+```
+├── bot.js                    # Uygulama giriş noktası
+├── Dockerfile                # Multi-stage Docker build (distroless runtime)
+├── api/
+│   └── webhook.js            # Bot mesaj & callback handler'ları
+├── db/
+│   ├── pharmacies.json       # Türkiye eczane veritabanı
+│   └── holidays.json         # Resmi tatil günleri
+└── services/
+    ├── collect-api.js        # Collect API entegrasyonu (nöbetçi)
+    ├── find-pharmacies.js    # Yerel DB'den eczane arama ve mesafe hesabı
+    ├── holiday-api.js        # Resmi tatil kontrolü
+    ├── logger.js             # Loglama servisi
+    ├── my-api.js             # Özel API entegrasyonu
+    └── openstreetmap-api.js  # Koordinat → il/ilçe dönüşümü
+```
 
 ## Katkıda Bulunma
 
-Kodu iyileştirmek, varsa bir hatayı gidermek veya yeni özellikler katmak isterseniz repo'yu clone'layın ve geliştirme sonrası bir Pull Request oluşturun. Desteğiniz için şimdiden teşekkür ederim.
+Kodu iyileştirmek, bir hatayı gidermek veya yeni özellikler eklemek isterseniz repo'yu fork'layın ve geliştirme sonrası bir Pull Request oluşturun. Desteğiniz için şimdiden teşekkür ederim.
 
 

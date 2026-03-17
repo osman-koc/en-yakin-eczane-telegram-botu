@@ -11,7 +11,7 @@ function timestamp() {
 }
 
 function buildLine(level, chatId, message) {
-  const lvl = level.toUpperCase().padEnd(5);
+  const lvl = level.toUpperCase();
   const ctx = chatId ? `[chat:${chatId}]` : '[system]     ';
   return `[${timestamp()}] [${lvl}] ${ctx} ${message}`;
 }

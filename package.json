@@ -23,9 +23,9 @@
     "start": "node bot.js"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.3.1",
     "geolib": "^3.3.4",
-    "grammy": "^1.36.3",
-    "query-string": "^9.0.0"
+    "grammy": "^1.41.1",
+    "query-string": "^9.3.1"
   }
 }
